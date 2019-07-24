@@ -30,14 +30,71 @@
 //
 // **********************************************************************************
 
-resources: 
+#ifndef KEYMOLEN_VDECODER_HPP
+#define KEYMOLEN_VDECODER_HPP
 
-demux containers (like mkv):
-  https://riptutorial.com/ffmpeg/example/30955/reading-from-memory
+#include "common.hpp"
 
-decode audio/video stream:
-  https://libav.org/documentation/doxygen/master/decode_video_8c-example.html
 
-convert AVFrame to cv::Mat:
-  https://timvanoosterhout.wordpress.com/2015/07/02/converting-an-ffmpeg-avframe-to-and-opencv-mat/
+#include <istream> 
+#include <iostream>
+
+
+extern "C" {
+  #include "libavcodec/avcodec.h"
+  #include "libavutil/common.h"
+  #include "libavutil/imgutils.h"
+  #include "libavutil/mathematics.h"
+  #include "libavformat/avformat.h"
+  #include "libavformat/avio.h"
+}
+
+
+namespace keymolen
+{
+  
+  class VDecoder
+  {
+  private:
+    const static int FILE_STREAM_BUFFER_SIZE = 8192;
+  public:
+    VDecoder();
+    virtual ~VDecoder();
+  public:
+    int setup(enum AVCodecID codec_id, int (*read_cb)(unsigned char* data, int size, void *usr), void* usr);
+    int decode(void (frame_cb)(AVFrame *frame, void *usr), void* usr);
+    int reset();
+  private:
+    unsigned char* file_stream_buffer_;
+    AVIOContext* io_context_;
+    AVFormatContext* format_context_;
+  private:
+    static int _file_stream_read(void *usr, uint8_t *buf, int buf_size);
+    int file_stream_read(uint8_t *buf, int buf_size);
+    int decode(AVPacket *pkt);
+    int setup();
+  private:
+    enum AVCodecID codec_id_;
+    const AVCodec *codec_;
+    AVCodecParserContext *parser_;
+    AVCodecContext *codec_ctx_;
+    AVFrame *frame_;
+    struct
+    {
+      void (*cb)(AVFrame *frame, void *usr);
+      void* usr;
+    } decode_cb_;
+    struct
+    {
+      int (*cb)(unsigned char* data, int size, void *usr);
+      void* usr;
+    } read_cb_;
+  };
+
+
+}
+
+
+#endif
+
 

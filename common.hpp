@@ -30,14 +30,37 @@
 //
 // **********************************************************************************
 
-resources: 
+#ifndef NN_TRYOUT_COMMON_HPP
+#define NN_TRYOUT_COMMON_HPP
 
-demux containers (like mkv):
-  https://riptutorial.com/ffmpeg/example/30955/reading-from-memory
 
-decode audio/video stream:
-  https://libav.org/documentation/doxygen/master/decode_video_8c-example.html
 
-convert AVFrame to cv::Mat:
-  https://timvanoosterhout.wordpress.com/2015/07/02/converting-an-ffmpeg-avframe-to-and-opencv-mat/
+
+#include <algorithm>
+#include <assert.h>
+#include <chrono>
+#include <csignal>
+#include <fstream>
+#include <functional>
+#include <iostream>
+#include <sys/syscall.h>
+#include <sys/types.h>
+#include <time.h>
+#include <unistd.h>
+
+
+
+
+#define LOG_PRE __FILE__ << " " << __FUNCTION__<< ":" << __LINE__ << " "
+#define LOG_DBG(X) std::cout << LOG_PRE << X << std::endl;
+#define LOG_WARN LOG_DBG
+#define LOG_ERR LOG_DBG
+
+
+namespace keymolen {
+}
+
+
+#endif
+
 
